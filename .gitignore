@@ -1,0 +1,62 @@
+# Ignorar archivos de .NET / Visual Studio
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio 2017/2019 cache files
+.vs/
+*.user
+*.suo
+*.cache
+*.docstates
+*.csproj.user
+*.pidb
+*.psess
+*.vsp
+*.vspx
+*.sln.ide
+
+# .NET Core / .NET 6/8
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Node.js / npm (por si acaso)
+node_modules/
+npm-debug.log
+
+# Archivos de configuración local (contienen contraseñas o rutas especificas)
+appsettings.Development.json
+appsettings.Production.json
+
+# Archivos de Oracle / SQL Developer / PL/SQL
+*.log
+*.tmp
+*.trc
+*.aud
+*.dmp
+*.out
+*.dat
+
+# Archivos del sistema operativo
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Archivos generados por el compilador o empaquetadores
+*.exe
+*.dll
+*.pdb
+*.mdb
+*.vshost.exe
+*.vshost.exe.manifest
+*.vshost.pdb
