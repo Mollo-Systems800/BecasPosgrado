@@ -1,0 +1,79 @@
+@model List<Solicitud>
+@{
+    ViewData["Title"] = "Solicitudes";
+    var rol = ViewBag.Rol as string;
+}
+
+<h2>@(rol == "ADMIN" ? "Todas las solicitudes" : "Mis solicitudes")</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">Error de base de datos: @ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No hay solicitudes para mostrar.</p>
+}
+else
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                @if (rol == "ADMIN")
+                {
+                    <th>Postulante</th>
+                }
+                <th>Programa</th>
+                <th>Universidad</th>
+                <th>Fecha</th>
+                <th>Resumen</th>
+                <th>Estado</th>
+                @if (rol == "ADMIN")
+                {
+                    <th></th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    @if (rol == "ADMIN")
+                    {
+                        <td>@s.PostulanteNombreCompleto</td>
+                    }
+                    <td>@s.ProgramaNombre</td>
+                    <td>@s.UniversidadNombre</td>
+                    <td>@s.FechaPostulacion.ToString("dd/MM/yyyy")</td>
+                    <td>@s.ResumenInteres</td>
+                    <td>
+                        @switch (s.Estado)
+                        {
+                            case "Pendiente":
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                break;
+                            case "Aceptada":
+                                <span class="badge bg-success">Aceptada</span>
+                                break;
+                            default:
+                                <span class="badge bg-danger">@s.Estado</span>
+                                break;
+                        }
+                    </td>
+                    @if (rol == "ADMIN")
+                    {
+                        <td class="text-end">
+                            @if (s.Estado == "Pendiente")
+                            {
+                                <form asp-action="Aceptar" asp-route-id="@s.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
+                                </form>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

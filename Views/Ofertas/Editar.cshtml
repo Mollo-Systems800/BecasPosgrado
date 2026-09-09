@@ -1,0 +1,53 @@
+@model Oferta
+@{
+    ViewData["Title"] = "Editar oferta";
+}
+
+<h2>Editar oferta</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form asp-action="Editar" method="post" class="row g-3" style="max-width: 600px;">
+    <input type="hidden" asp-for="Id" />
+    <div class="col-12">
+        <label asp-for="IdPrograma" class="form-label">Programa</label>
+        <select asp-for="IdPrograma" asp-items="ViewBag.Programas" class="form-select">
+        </select>
+        <span asp-validation-for="IdPrograma" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="IdSede" class="form-label">Sede</label>
+        <select asp-for="IdSede" asp-items="ViewBag.Sedes" class="form-select">
+        </select>
+        <span asp-validation-for="IdSede" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaInicio" class="form-label"></label>
+        <input asp-for="FechaInicio" type="date" class="form-control" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="FechaFin" class="form-label"></label>
+        <input asp-for="FechaFin" type="date" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="CuposDisponibles" class="form-label"></label>
+        <input asp-for="CuposDisponibles" type="number" min="0" class="form-control" />
+    </div>
+    <div class="col-md-6">
+        <label asp-for="Estado" class="form-label"></label>
+        <select asp-for="Estado" class="form-select">
+            <option value="Activa">Activa</option>
+            <option value="Cerrada">Cerrada</option>
+        </select>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a asp-action="Administrar" class="btn btn-link">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

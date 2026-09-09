@@ -1,0 +1,90 @@
+@model List<Oferta>
+@{
+    ViewData["Title"] = "Ofertas de becas";
+    var rol = Context.Session.GetString("Rol");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Ofertas activas</h2>
+    @if (rol == "ADMIN")
+    {
+        <a asp-action="Administrar" class="btn btn-outline-secondary">Administrar ofertas</a>
+    }
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">Error de base de datos: @ViewBag.Error</div>
+}
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No hay ofertas activas en este momento.</p>
+}
+
+<div class="row g-3">
+    @foreach (var o in Model)
+    {
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">@o.ProgramaNombre</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@o.UniversidadNombre - @o.SedeNombre</h6>
+                    <p class="card-text">
+                        <span class="badge bg-info text-dark">@o.Area</span>
+                        <span class="badge bg-success">@o.CuposDisponibles cupos</span>
+                    </p>
+                    <p class="card-text small">
+                        Vigencia: @o.FechaInicio.ToString("dd/MM/yyyy") - @o.FechaFin.ToString("dd/MM/yyyy")
+                    </p>
+                    @if (rol == "POSTULANTE")
+                    {
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#modalPostular" data-oferta-id="@o.Id" data-oferta-nombre="@o.ProgramaNombre">
+                            Postularse
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (rol == "POSTULANTE")
+{
+    <div class="modal fade" id="modalPostular" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form asp-action="Postularse" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Postular a: <span id="modalOfertaNombre"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="IdOferta" id="modalIdOferta" />
+                    <div class="mb-3">
+                        <label class="form-label">Resumen de interés</label>
+                        <textarea name="ResumenInteres" class="form-control" rows="4" required
+                                  placeholder="Cuéntanos brevemente por qué te interesa este programa"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar postulación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        const modalPostular = document.getElementById('modalPostular');
+        if (modalPostular) {
+            modalPostular.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('modalIdOferta').value = button.getAttribute('data-oferta-id');
+                document.getElementById('modalOfertaNombre').textContent = button.getAttribute('data-oferta-nombre');
+            });
+        }
+    </script>
+}

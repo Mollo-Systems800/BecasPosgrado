@@ -1,0 +1,289 @@
+/* =========================================================
+   BecasPosgrado — Tema "Oxford"
+   Azul marino profundo + dorado envejecido + tipografía serif
+   ========================================================= */
+
+:root {
+  --oxford-navy: #0d1f3c;
+  --oxford-navy-2: #16294d;
+  --oxford-navy-light: #24365c;
+  --oxford-gold: #c8a951;
+  --oxford-gold-dark: #a3822f;
+  --oxford-gold-soft: #e8d9ad;
+  --cream: #f8f6f0;
+  --cream-2: #f1ede1;
+  --ink: #1f2430;
+  --ink-muted: #5b6272;
+  --line: #e2ddcd;
+
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Source Sans 3", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+html {
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background-color: var(--cream);
+  background-image:
+    linear-gradient(180deg, rgba(13, 31, 60, 0.03), rgba(13, 31, 60, 0) 220px);
+}
+
+h1, h2, h3, h4, h5, h6,
+.display-4, .display-5, .display-6 {
+  font-family: var(--font-display);
+  color: var(--oxford-navy);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+a {
+  color: var(--oxford-navy);
+}
+
+a:hover {
+  color: var(--oxford-gold-dark);
+}
+
+/* ---------- Navbar ---------- */
+
+.navbar.bg-dark,
+header nav.navbar {
+  background: linear-gradient(180deg, var(--oxford-navy) 0%, var(--oxford-navy-2) 100%) !important;
+  border-bottom: 3px solid var(--oxford-gold) !important;
+  box-shadow: 0 2px 10px rgba(13, 31, 60, 0.25);
+}
+
+.navbar .navbar-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: var(--cream) !important;
+  letter-spacing: 0.3px;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  position: relative;
+  margin: 0 0.15rem;
+  color: rgba(248, 246, 240, 0.85) !important;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: var(--oxford-gold-soft) !important;
+}
+
+.navbar .nav-link.text-warning {
+  color: var(--oxford-gold) !important;
+  font-weight: 600;
+}
+
+.navbar .dropdown-menu {
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--oxford-gold);
+  box-shadow: 0 8px 20px rgba(13, 31, 60, 0.18);
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: var(--cream-2);
+  color: var(--oxford-navy);
+}
+
+/* ---------- Botones ---------- */
+
+.btn {
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background-color: var(--oxford-navy);
+  border-color: var(--oxford-navy);
+  color: var(--cream);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--oxford-gold-dark);
+  border-color: var(--oxford-gold-dark);
+  color: #fff;
+}
+
+.btn-outline-secondary {
+  color: var(--oxford-navy);
+  border-color: var(--oxford-navy);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--oxford-navy);
+  border-color: var(--oxford-navy);
+  color: var(--cream);
+}
+
+.btn-success {
+  background-color: #2f6b4f;
+  border-color: #2f6b4f;
+}
+
+.btn-success:hover {
+  background-color: #24503b;
+  border-color: #24503b;
+}
+
+.btn-danger {
+  background-color: #8c2f2f;
+  border-color: #8c2f2f;
+}
+
+.btn-danger:hover {
+  background-color: #6f2323;
+  border-color: #6f2323;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(200, 169, 81, 0.35);
+  border-color: var(--oxford-gold);
+}
+
+/* ---------- Tarjetas ---------- */
+
+.card {
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--oxford-gold);
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.card.shadow, .card.shadow-sm {
+  box-shadow: 0 6px 18px rgba(13, 31, 60, 0.10) !important;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  color: var(--oxford-navy);
+  font-weight: 700;
+}
+
+.card-text {
+  color: var(--ink-muted);
+}
+
+/* ---------- Insignias / estados ---------- */
+
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 0.4em 0.65em;
+}
+
+.badge.bg-success {
+  background-color: #2f6b4f !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--oxford-gold) !important;
+  color: var(--oxford-navy) !important;
+}
+
+.badge.bg-secondary {
+  background-color: #6b7280 !important;
+}
+
+.badge.bg-danger {
+  background-color: #8c2f2f !important;
+}
+
+/* ---------- Alertas ---------- */
+
+.alert-info {
+  background-color: var(--cream-2);
+  border: 1px solid var(--oxford-gold);
+  border-left: 5px solid var(--oxford-gold);
+  color: var(--oxford-navy);
+}
+
+.alert-danger {
+  border-left: 5px solid #8c2f2f;
+}
+
+/* ---------- Tablas ---------- */
+
+.table {
+  background-color: #fff;
+  border-color: var(--line);
+}
+
+.table thead {
+  background-color: var(--oxford-navy);
+}
+
+.table thead th {
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-color: var(--oxford-navy);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: var(--cream-2);
+}
+
+/* ---------- Formularios ---------- */
+
+.form-label {
+  font-weight: 600;
+  color: var(--oxford-navy);
+}
+
+.form-control, .form-select {
+  border-color: var(--line);
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  background: var(--oxford-navy);
+  color: rgba(248, 246, 240, 0.75);
+  border-top: 3px solid var(--oxford-gold) !important;
+  padding: 1rem 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+}
+
+.footer a {
+  color: var(--oxford-gold-soft);
+}
+
+/* ---------- Utilidades ---------- */
+
+.text-muted {
+  color: var(--ink-muted) !important;
+}
+
+hr.gold-divider {
+  width: 64px;
+  height: 3px;
+  background: var(--oxford-gold);
+  border: none;
+  margin: 0.75rem auto 1.25rem;
+}

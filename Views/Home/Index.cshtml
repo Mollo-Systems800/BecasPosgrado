@@ -1,0 +1,52 @@
+@{
+    ViewData["Title"] = "Inicio";
+    var rol = ViewBag.Rol as string;
+    var nombre = ViewBag.NombreCompleto as string;
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-6">Bienvenido/a, @nombre</h1>
+    <p class="text-muted">Rol: <span class="badge bg-secondary">@rol</span></p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Ofertas de becas</h5>
+                <p class="card-text">Consulta las ofertas activas de maestrías, doctorados y especialidades.</p>
+                <a asp-controller="Ofertas" asp-action="Index" class="btn btn-primary">Ver ofertas</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Mis solicitudes</h5>
+                <p class="card-text">
+                    @if (rol == "ADMIN")
+                    {
+                        <text>Revisa y gestiona todas las solicitudes de los postulantes.</text>
+                    }
+                    else
+                    {
+                        <text>Revisa el estado de tus postulaciones.</text>
+                    }
+                </p>
+                <a asp-controller="Solicitudes" asp-action="Index" class="btn btn-primary">Ver solicitudes</a>
+            </div>
+        </div>
+    </div>
+    @if (rol == "ADMIN")
+    {
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Administración</h5>
+                    <p class="card-text">Gestiona universidades, sedes, programas y ofertas.</p>
+                    <a asp-controller="Ofertas" asp-action="Administrar" class="btn btn-outline-secondary">Ir a Administración</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

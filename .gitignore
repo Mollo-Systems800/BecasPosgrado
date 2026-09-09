@@ -1,0 +1,14 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Configuración local con la clave real de Oracle (no subir)
+appsettings.Development.json
+
+## VS Code
+.vscode/
+
+## Logs
+*.log

@@ -1,0 +1,55 @@
+@model List<Oferta>
+@{
+    ViewData["Title"] = "Administrar ofertas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Administrar ofertas</h2>
+    <a asp-action="Crear" class="btn btn-primary">+ Nueva oferta</a>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">Error de base de datos: @ViewBag.Error</div>
+}
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Programa</th>
+            <th>Universidad / Sede</th>
+            <th>Vigencia</th>
+            <th>Cupos</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>@o.ProgramaNombre <span class="badge bg-info text-dark">@o.Area</span></td>
+                <td>@o.UniversidadNombre - @o.SedeNombre</td>
+                <td>@o.FechaInicio.ToString("dd/MM/yyyy") - @o.FechaFin.ToString("dd/MM/yyyy")</td>
+                <td>@o.CuposDisponibles</td>
+                <td>
+                    @if (o.Estado == "Activa")
+                    {
+                        <span class="badge bg-success">Activa</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Cerrada</span>
+                    }
+                </td>
+                <td class="text-end">
+                    <a asp-action="Editar" asp-route-id="@o.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <form asp-action="Eliminar" asp-route-id="@o.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Eliminar esta oferta?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

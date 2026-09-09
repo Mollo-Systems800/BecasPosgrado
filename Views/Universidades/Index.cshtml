@@ -1,0 +1,44 @@
+@model List<Universidad>
+@{
+    ViewData["Title"] = "Universidades";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Universidades</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Nueva universidad</a>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">Error de base de datos: @ViewBag.Error</div>
+}
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>País</th>
+            <th>Ciudad</th>
+            <th>Teléfono</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Nombre</td>
+                <td>@u.Pais</td>
+                <td>@u.Ciudad</td>
+                <td>@u.Telefono</td>
+                <td class="text-end">
+                    <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@u.Id" method="post" class="d-inline"
+                          onsubmit="return confirm('¿Eliminar la universidad @u.Nombre?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

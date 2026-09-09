@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Driver oficial de Oracle para .NET. Si esta versión ya no está disponible
+         cuando hagas el restore, corre: dotnet add package Oracle.ManagedDataAccess.Core
+         y va a tomar automáticamente la última versión estable. -->
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.6.1" />
+  </ItemGroup>
+
+</Project>
