@@ -18,6 +18,7 @@
         <tr>
             <th>Programa</th>
             <th>Universidad / Sede</th>
+            <th>Límite de postulación</th>
             <th>Vigencia</th>
             <th>Cupos</th>
             <th>Estado</th>
@@ -30,6 +31,7 @@
             <tr>
                 <td>@o.ProgramaNombre <span class="badge bg-info text-dark">@o.Area</span></td>
                 <td>@o.UniversidadNombre - @o.SedeNombre</td>
+                <td>@o.FechaLimitePostulacion.ToString("dd/MM/yyyy")</td>
                 <td>@o.FechaInicio.ToString("dd/MM/yyyy") - @o.FechaFin.ToString("dd/MM/yyyy")</td>
                 <td>@o.CuposDisponibles</td>
                 <td>

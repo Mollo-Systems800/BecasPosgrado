@@ -21,8 +21,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(1200px 600px at 50% -10%, rgba(200, 169, 81, 0.18), transparent 60%),
-                        linear-gradient(160deg, #0d1f3c 0%, #16294d 55%, #1f3760 100%);
+            background: radial-gradient(1200px 600px at 50% -10%, rgba(154, 163, 173, 0.22), transparent 60%),
+                        linear-gradient(160deg, #4a0f20 0%, #6f1830 55%, #8f2c48 100%);
             font-family: var(--font-body);
             padding: 1.5rem;
         }
@@ -31,7 +31,7 @@
             width: 100%;
             max-width: 420px;
             background: #fbfaf6;
-            border-top: 5px solid var(--oxford-gold);
+            border-top: 5px solid var(--plata);
             border-radius: 8px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
             padding: 2.5rem 2.25rem 2rem;
@@ -44,7 +44,7 @@
 
         .login-brand h1 {
             font-family: var(--font-display);
-            color: var(--oxford-navy);
+            color: var(--guindo);
             font-size: 1.85rem;
             margin: 0.25rem 0 0;
             letter-spacing: 0.4px;
@@ -80,7 +80,7 @@
         <p class="login-subtitle">Sistema de gestión de becas de posgrado</p>
         <hr class="gold-divider" />
 
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <form asp-controller="Account" asp-action="Login" method="post">
             <div class="mb-3">

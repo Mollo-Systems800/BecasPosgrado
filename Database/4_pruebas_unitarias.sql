@@ -7,8 +7,10 @@ DECLARE
     v_id_oferta NUMBER;
     v_programa VARCHAR2(150);
     v_area VARCHAR2(50);
+    v_financiamiento VARCHAR2(50);
     v_univ VARCHAR2(150);
     v_sede VARCHAR2(150);
+    v_limite DATE;
     v_inicio DATE;
     v_fin DATE;
     v_cupos NUMBER;
@@ -19,11 +21,11 @@ BEGIN
     v_mensaje := F_REGISTRAR_SOLICITUD(2, 1, 'Tengo mucho interés en Data Science.');
     DBMS_OUTPUT.PUT_LINE('Prueba 1 (Postulación exitosa): ' || v_mensaje);
 
-    -- 2. Prueba: DUP_VAL_ON_INDEX (Postular al mismo programa)
+    -- 2. Prueba: Programa único (Postular otra vez al mismo programa/oferta)
     v_mensaje := F_REGISTRAR_SOLICITUD(2, 1, 'Intento de fraude jeje.');
-    DBMS_OUTPUT.PUT_LINE('Prueba 2 (Postulación duplicada): ' || v_mensaje);
+    DBMS_OUTPUT.PUT_LINE('Prueba 2 (Postulación duplicada - mismo programa): ' || v_mensaje);
 
-    -- 3. Prueba: Oferta vencida o inexistente
+    -- 3. Prueba: Oferta vencida (Oferta 4 está Cerrada / plazo vencido)
     v_mensaje := F_REGISTRAR_SOLICITUD(2, 4, 'Quiero el programa de Física.');
     DBMS_OUTPUT.PUT_LINE('Prueba 3 (Oferta cerrada): ' || v_mensaje);
 
@@ -53,12 +55,12 @@ BEGIN
     v_mensaje := F_ACEPTAR_SOLICITUD(4);
     DBMS_OUTPUT.PUT_LINE('Prueba 7b (Intentar aceptar sin cupos): ' || v_mensaje);
 
-    -- 8. Prueba: Consultar Ofertas (Cursor)
+    -- 8. Prueba: Consultar Ofertas (Cursor devuelto por función)
     DBMS_OUTPUT.PUT_LINE('--- RESULTADOS DEL CURSOR (Solo Maestría) ---');
-    P_CONSULTAR_OFERTAS(p_area => 'Maestría', p_id_universidad => NULL, p_cursor => v_cursor);
+    v_cursor := F_CONSULTAR_OFERTAS(p_area => 'Maestría', p_id_universidad => NULL, p_tipo_financiamiento => NULL);
 
     LOOP
-        FETCH v_cursor INTO v_id_oferta, v_programa, v_area, v_univ, v_sede, v_inicio, v_fin, v_cupos;
+        FETCH v_cursor INTO v_id_oferta, v_programa, v_area, v_financiamiento, v_univ, v_sede, v_limite, v_inicio, v_fin, v_cupos;
         EXIT WHEN v_cursor%NOTFOUND;
         DBMS_OUTPUT.PUT_LINE('Oferta ID: ' || v_id_oferta || ' | Prog: ' || v_programa || ' | Univ: ' || v_univ || ' | Cupos restantes: ' || v_cupos);
     END LOOP;

@@ -35,7 +35,10 @@
                         <span class="badge bg-success">@o.CuposDisponibles cupos</span>
                     </p>
                     <p class="card-text small">
-                        Vigencia: @o.FechaInicio.ToString("dd/MM/yyyy") - @o.FechaFin.ToString("dd/MM/yyyy")
+                        Vigencia del programa: @o.FechaInicio.ToString("dd/MM/yyyy") - @o.FechaFin.ToString("dd/MM/yyyy")
+                    </p>
+                    <p class="card-text small text-danger">
+                        Postula antes del: @o.FechaLimitePostulacion.ToString("dd/MM/yyyy")
                     </p>
                     @if (rol == "POSTULANTE")
                     {

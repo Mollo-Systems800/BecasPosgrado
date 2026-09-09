@@ -5,7 +5,7 @@
 
 <h2>Editar oferta</h2>
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
 <form asp-action="Editar" method="post" class="row g-3" style="max-width: 600px;">
     <input type="hidden" asp-for="Id" />
@@ -21,12 +21,17 @@
         </select>
         <span asp-validation-for="IdSede" class="text-danger"></span>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <label asp-for="FechaLimitePostulacion" class="form-label">Fecha límite de postulación</label>
+        <input asp-for="FechaLimitePostulacion" type="date" class="form-control" />
+        <span asp-validation-for="FechaLimitePostulacion" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
         <label asp-for="FechaInicio" class="form-label"></label>
         <input asp-for="FechaInicio" type="date" class="form-control" />
         <span asp-validation-for="FechaInicio" class="text-danger"></span>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <label asp-for="FechaFin" class="form-label"></label>
         <input asp-for="FechaFin" type="date" class="form-control" />
         <span asp-validation-for="FechaFin" class="text-danger"></span>

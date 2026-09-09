@@ -92,7 +92,12 @@ namespace BecasPosgrado.Controllers
         public IActionResult Crear()
         {
             CargarCombos();
-            return View(new Oferta { FechaInicio = DateTime.Today, FechaFin = DateTime.Today.AddMonths(1) });
+            return View(new Oferta
+            {
+                FechaLimitePostulacion = DateTime.Today.AddDays(15),
+                FechaInicio = DateTime.Today.AddMonths(1),
+                FechaFin = DateTime.Today.AddMonths(1).AddDays(1)
+            });
         }
 
         [HttpPost]

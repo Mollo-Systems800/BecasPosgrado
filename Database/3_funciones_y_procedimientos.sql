@@ -7,22 +7,25 @@ CREATE OR REPLACE FUNCTION F_REGISTRAR_SOLICITUD (
     p_resumen IN CLOB
 ) RETURN VARCHAR2 IS
     v_dummy NUMBER;
-    v_estado_oferta VARCHAR2(20);
+    v_id_programa NUMBER;
     v_conteo_solicitudes NUMBER;
+    v_conteo_mismo_programa NUMBER;
 BEGIN
     -- 1. Validar existencia de postulante (Levanta NO_DATA_FOUND si no existe)
     SELECT id INTO v_dummy FROM POSTULANTE WHERE id = p_id_postulante;
 
-    -- 2. Validar que la oferta exista y esté activa (en fechas)
+    -- 2. Validar que la oferta exista, esté activa y dentro del plazo de postulación
+    --    (fecha_limite_postulacion: hasta cuándo se puede postular; si es NULL se
+    --     acepta mientras el programa no haya iniciado)
     BEGIN
-        SELECT id INTO v_dummy
+        SELECT id, id_programa INTO v_dummy, v_id_programa
         FROM OFERTA
         WHERE id = p_id_oferta
-          AND SYSDATE BETWEEN fecha_inicio AND fecha_fin
-          AND estado = 'Activa';
+          AND estado = 'Activa'
+          AND SYSDATE <= NVL(fecha_limite_postulacion, fecha_inicio);
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20001, 'La oferta no existe o no se encuentra activa en este momento.');
+            RAISE_APPLICATION_ERROR(-20001, 'La oferta no existe, está cerrada o el plazo de postulación ya venció.');
     END;
 
     -- 3. Validar máximo de 3 solicitudes en proceso ('Pendiente' o 'Aceptada')
@@ -35,7 +38,20 @@ BEGIN
         RAISE_APPLICATION_ERROR(-20002, 'El postulante ya ha alcanzado el límite máximo de 3 programas.');
     END IF;
 
-    -- 4. Inserción (Puede levantar DUP_VAL_ON_INDEX gracias a la restricción UNIQUE)
+    -- 4. Validar que no exista ya una solicitud (Pendiente/Aceptada) para el MISMO
+    --    PROGRAMA, aunque sea en una oferta/sede distinta (programa único por postulante)
+    SELECT COUNT(*) INTO v_conteo_mismo_programa
+    FROM SOLICITUD sol
+    JOIN OFERTA ofe ON sol.id_oferta = ofe.id
+    WHERE sol.id_postulante = p_id_postulante
+      AND ofe.id_programa = v_id_programa
+      AND sol.estado IN ('Pendiente', 'Aceptada');
+
+    IF v_conteo_mismo_programa > 0 THEN
+        RAISE_APPLICATION_ERROR(-20005, 'Ya tienes una solicitud registrada para este programa (en otra sede u oferta).');
+    END IF;
+
+    -- 5. Inserción (Puede levantar DUP_VAL_ON_INDEX gracias a la restricción UNIQUE)
     INSERT INTO SOLICITUD (id_postulante, id_oferta, resumen_interes, estado)
     VALUES (p_id_postulante, p_id_oferta, p_resumen, 'Pendiente');
 
@@ -111,21 +127,24 @@ END F_ACEPTAR_SOLICITUD;
 /
 
 -- =========================================================
--- PROCEDIMIENTO 3: CONSULTAR OFERTAS (Para la grilla en MVC)
+-- FUNCIÓN 3: CONSULTAR OFERTAS (Para la grilla en MVC)
 -- =========================================================
-CREATE OR REPLACE PROCEDURE P_CONSULTAR_OFERTAS (
+CREATE OR REPLACE FUNCTION F_CONSULTAR_OFERTAS (
     p_area IN VARCHAR2 DEFAULT NULL,
     p_id_universidad IN NUMBER DEFAULT NULL,
-    p_cursor OUT SYS_REFCURSOR
-) IS
+    p_tipo_financiamiento IN VARCHAR2 DEFAULT NULL
+) RETURN SYS_REFCURSOR IS
+    p_cursor SYS_REFCURSOR;
 BEGIN
     OPEN p_cursor FOR
         SELECT
             o.id as id_oferta,
             p.nombre as programa,
             p.area,
+            p.tipo_financiamiento,
             u.nombre as universidad,
             s.nombre as sede,
+            o.fecha_limite_postulacion,
             o.fecha_inicio,
             o.fecha_fin,
             o.cupos_disponibles
@@ -133,10 +152,13 @@ BEGIN
         JOIN PROGRAMA p ON o.id_programa = p.id
         JOIN SEDE s ON o.id_sede = s.id
         JOIN UNIVERSIDAD u ON s.id_universidad = u.id
-        WHERE SYSDATE BETWEEN o.fecha_inicio AND o.fecha_fin
-          AND o.estado = 'Activa'
+        WHERE o.estado = 'Activa'
+          AND SYSDATE <= NVL(o.fecha_limite_postulacion, o.fecha_inicio)
           AND (p_area IS NULL OR p.area = p_area)
           AND (p_id_universidad IS NULL OR u.id = p_id_universidad)
+          AND (p_tipo_financiamiento IS NULL OR p.tipo_financiamiento = p_tipo_financiamiento)
         ORDER BY o.fecha_inicio DESC;
-END P_CONSULTAR_OFERTAS;
+
+    RETURN p_cursor;
+END F_CONSULTAR_OFERTAS;
 /

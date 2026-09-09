@@ -36,6 +36,7 @@ CREATE SEQUENCE SEQ_COMPONENTE START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE POSTULANTE (
     id NUMBER DEFAULT SEQ_POSTULANTE.NEXTVAL PRIMARY KEY,
+    -- Datos personales
     nombre VARCHAR2(100) NOT NULL,
     apellido VARCHAR2(100) NOT NULL,
     email VARCHAR2(100) UNIQUE NOT NULL,
@@ -44,7 +45,16 @@ CREATE TABLE POSTULANTE (
     fecha_nac DATE NOT NULL,
     usuario VARCHAR2(50) UNIQUE NOT NULL,
     clave VARCHAR2(255) NOT NULL,
-    rol VARCHAR2(20) DEFAULT 'POSTULANTE' CHECK (rol IN ('ADMIN', 'POSTULANTE'))
+    rol VARCHAR2(20) DEFAULT 'POSTULANTE' CHECK (rol IN ('ADMIN', 'POSTULANTE')),
+    -- Datos académicos (formación previa con la que postula al posgrado)
+    nivel_academico VARCHAR2(50),
+    institucion_procedencia VARCHAR2(150),
+    titulo_obtenido VARCHAR2(150),
+    promedio_academico NUMBER(5,2) CHECK (promedio_academico IS NULL OR promedio_academico BETWEEN 0 AND 100),
+    -- Datos laborales
+    empresa_actual VARCHAR2(150),
+    cargo_actual VARCHAR2(100),
+    anios_experiencia NUMBER(3) DEFAULT 0 CHECK (anios_experiencia >= 0)
 );
 
 CREATE TABLE UNIVERSIDAD (
@@ -76,8 +86,9 @@ CREATE TABLE OFERTA (
     id NUMBER DEFAULT SEQ_OFERTA.NEXTVAL PRIMARY KEY,
     id_programa NUMBER NOT NULL,
     id_sede NUMBER NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
+    fecha_limite_postulacion DATE, -- hasta cuándo se puede postular a esta oferta
+    fecha_inicio DATE NOT NULL,    -- inicio del programa
+    fecha_fin DATE NOT NULL,       -- finalización del programa
     cupos_disponibles NUMBER CHECK (cupos_disponibles >= 0),
     estado VARCHAR2(20) DEFAULT 'Activa' CHECK (estado IN ('Activa', 'Cerrada')),
     CONSTRAINT fk_oferta_prog FOREIGN KEY (id_programa) REFERENCES PROGRAMA(id),

@@ -1,20 +1,20 @@
 /* =========================================================
-   BecasPosgrado — Tema "Oxford"
-   Azul marino profundo + dorado envejecido + tipografía serif
+   BecasPosgrado — Tema institucional
+   Guindo (vino) + plateado, tipografía serif para títulos
    ========================================================= */
 
 :root {
-  --oxford-navy: #0d1f3c;
-  --oxford-navy-2: #16294d;
-  --oxford-navy-light: #24365c;
-  --oxford-gold: #c8a951;
-  --oxford-gold-dark: #a3822f;
-  --oxford-gold-soft: #e8d9ad;
-  --cream: #f8f6f0;
-  --cream-2: #f1ede1;
-  --ink: #1f2430;
-  --ink-muted: #5b6272;
-  --line: #e2ddcd;
+  --guindo: #6f1830;
+  --guindo-dark: #4a0f20;
+  --guindo-light: #8f2c48;
+  --plata: #9aa3ad;
+  --plata-dark: #5c6570;
+  --plata-soft: #dfe2e6;
+  --bg: #f5f5f6;
+  --bg-2: #ececee;
+  --ink: #211f22;
+  --ink-muted: #5b5b62;
+  --line: #dcdde0;
 
   --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
   --font-body: "Source Sans 3", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
@@ -35,45 +35,49 @@ body {
   min-height: 100%;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 body {
   margin-bottom: 0;
   font-family: var(--font-body);
   color: var(--ink);
-  background-color: var(--cream);
+  background-color: var(--bg);
   background-image:
-    linear-gradient(180deg, rgba(13, 31, 60, 0.03), rgba(13, 31, 60, 0) 220px);
+    linear-gradient(180deg, rgba(111, 24, 48, 0.035), rgba(111, 24, 48, 0) 220px);
 }
 
 h1, h2, h3, h4, h5, h6,
 .display-4, .display-5, .display-6 {
   font-family: var(--font-display);
-  color: var(--oxford-navy);
+  color: var(--guindo);
   font-weight: 700;
   letter-spacing: 0.2px;
 }
 
 a {
-  color: var(--oxford-navy);
+  color: var(--guindo);
 }
 
 a:hover {
-  color: var(--oxford-gold-dark);
+  color: var(--guindo-light);
 }
 
 /* ---------- Navbar ---------- */
 
 .navbar.bg-dark,
 header nav.navbar {
-  background: linear-gradient(180deg, var(--oxford-navy) 0%, var(--oxford-navy-2) 100%) !important;
-  border-bottom: 3px solid var(--oxford-gold) !important;
-  box-shadow: 0 2px 10px rgba(13, 31, 60, 0.25);
+  background: linear-gradient(180deg, var(--guindo-dark) 0%, var(--guindo) 100%) !important;
+  border-bottom: 3px solid var(--plata) !important;
+  box-shadow: 0 2px 10px rgba(74, 15, 32, 0.3);
 }
 
 .navbar .navbar-brand {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.35rem;
-  color: var(--cream) !important;
+  color: #fff !important;
   letter-spacing: 0.3px;
 }
 
@@ -81,29 +85,29 @@ header nav.navbar {
   font-weight: 500;
   position: relative;
   margin: 0 0.15rem;
-  color: rgba(248, 246, 240, 0.85) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .navbar .nav-link:hover,
 .navbar .nav-link:focus {
-  color: var(--oxford-gold-soft) !important;
+  color: var(--plata-soft) !important;
 }
 
 .navbar .nav-link.text-warning {
-  color: var(--oxford-gold) !important;
+  color: var(--plata-soft) !important;
   font-weight: 600;
 }
 
 .navbar .dropdown-menu {
   border: 1px solid var(--line);
-  border-top: 3px solid var(--oxford-gold);
-  box-shadow: 0 8px 20px rgba(13, 31, 60, 0.18);
+  border-top: 3px solid var(--guindo);
+  box-shadow: 0 8px 20px rgba(74, 15, 32, 0.18);
 }
 
 .navbar .dropdown-item:hover,
 .navbar .dropdown-item:focus {
-  background-color: var(--cream-2);
-  color: var(--oxford-navy);
+  background-color: var(--bg-2);
+  color: var(--guindo);
 }
 
 /* ---------- Botones ---------- */
@@ -115,27 +119,27 @@ header nav.navbar {
 }
 
 .btn-primary {
-  background-color: var(--oxford-navy);
-  border-color: var(--oxford-navy);
-  color: var(--cream);
+  background-color: var(--guindo);
+  border-color: var(--guindo);
+  color: #fff;
 }
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: var(--oxford-gold-dark);
-  border-color: var(--oxford-gold-dark);
-  color: #fff;
+  background-color: var(--plata);
+  border-color: var(--plata-dark);
+  color: var(--guindo-dark);
 }
 
 .btn-outline-secondary {
-  color: var(--oxford-navy);
-  border-color: var(--oxford-navy);
+  color: var(--guindo);
+  border-color: var(--guindo);
 }
 
 .btn-outline-secondary:hover {
-  background-color: var(--oxford-navy);
-  border-color: var(--oxford-navy);
-  color: var(--cream);
+  background-color: var(--guindo);
+  border-color: var(--guindo);
+  color: #fff;
 }
 
 .btn-success {
@@ -160,26 +164,26 @@ header nav.navbar {
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
 .form-control:focus, .form-check-input:focus, .form-select:focus {
-  box-shadow: 0 0 0 0.2rem rgba(200, 169, 81, 0.35);
-  border-color: var(--oxford-gold);
+  box-shadow: 0 0 0 0.2rem rgba(111, 24, 48, 0.25);
+  border-color: var(--guindo);
 }
 
 /* ---------- Tarjetas ---------- */
 
 .card {
   border: 1px solid var(--line);
-  border-top: 4px solid var(--oxford-gold);
+  border-top: 4px solid var(--guindo);
   border-radius: 6px;
   background-color: #fff;
 }
 
 .card.shadow, .card.shadow-sm {
-  box-shadow: 0 6px 18px rgba(13, 31, 60, 0.10) !important;
+  box-shadow: 0 6px 18px rgba(74, 15, 32, 0.10) !important;
 }
 
 .card-title {
   font-family: var(--font-display);
-  color: var(--oxford-navy);
+  color: var(--guindo);
   font-weight: 700;
 }
 
@@ -200,12 +204,12 @@ header nav.navbar {
 }
 
 .badge.bg-warning {
-  background-color: var(--oxford-gold) !important;
-  color: var(--oxford-navy) !important;
+  background-color: #c9a227 !important;
+  color: #3a2a05 !important;
 }
 
 .badge.bg-secondary {
-  background-color: #6b7280 !important;
+  background-color: var(--plata-dark) !important;
 }
 
 .badge.bg-danger {
@@ -215,10 +219,10 @@ header nav.navbar {
 /* ---------- Alertas ---------- */
 
 .alert-info {
-  background-color: var(--cream-2);
-  border: 1px solid var(--oxford-gold);
-  border-left: 5px solid var(--oxford-gold);
-  color: var(--oxford-navy);
+  background-color: var(--bg-2);
+  border: 1px solid var(--plata);
+  border-left: 5px solid var(--guindo);
+  color: var(--guindo-dark);
 }
 
 .alert-danger {
@@ -233,45 +237,51 @@ header nav.navbar {
 }
 
 .table thead {
-  background-color: var(--oxford-navy);
+  background-color: var(--guindo);
 }
 
 .table thead th {
-  color: var(--cream);
+  color: #fff;
   font-family: var(--font-display);
   font-weight: 700;
-  border-color: var(--oxford-navy);
+  border-color: var(--guindo);
   vertical-align: middle;
 }
 
 .table tbody tr:hover {
-  background-color: var(--cream-2);
+  background-color: var(--bg-2);
 }
 
 /* ---------- Formularios ---------- */
 
 .form-label {
   font-weight: 600;
-  color: var(--oxford-navy);
+  color: var(--guindo);
 }
 
 .form-control, .form-select {
   border-color: var(--line);
 }
 
+.text-danger,
+.validation-summary-errors {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
-  background: var(--oxford-navy);
-  color: rgba(248, 246, 240, 0.75);
-  border-top: 3px solid var(--oxford-gold) !important;
+  background: var(--guindo-dark);
+  color: rgba(255, 255, 255, 0.75);
+  border-top: 3px solid var(--plata) !important;
   padding: 1rem 0;
   font-size: 0.85rem;
   letter-spacing: 0.3px;
 }
 
 .footer a {
-  color: var(--oxford-gold-soft);
+  color: var(--plata-soft);
 }
 
 /* ---------- Utilidades ---------- */
@@ -283,7 +293,7 @@ header nav.navbar {
 hr.gold-divider {
   width: 64px;
   height: 3px;
-  background: var(--oxford-gold);
+  background: var(--plata);
   border: none;
   margin: 0.75rem auto 1.25rem;
 }
