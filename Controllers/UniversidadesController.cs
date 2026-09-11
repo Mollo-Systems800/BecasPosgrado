@@ -1,5 +1,6 @@
 using BecasPosgrado.Data;
 using BecasPosgrado.Filters;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using Microsoft.AspNetCore.Mvc;
 using Oracle.ManagedDataAccess.Client;
@@ -24,7 +25,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return View(new List<Universidad>());
             }
         }
@@ -44,7 +45,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 return View(model);
             }
         }
@@ -59,7 +60,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -77,7 +78,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 return View(model);
             }
         }
@@ -93,7 +94,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                TempData["Mensaje"] = "No se pudo eliminar: " + ex.Message;
+                TempData["Mensaje"] = "No se pudo eliminar: " + OracleErrorHelper.MensajeAmigable(ex);
             }
             return RedirectToAction(nameof(Index));
         }

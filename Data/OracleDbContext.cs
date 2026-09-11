@@ -1,4 +1,5 @@
 using System.Data;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
@@ -26,8 +27,11 @@ namespace BecasPosgrado.Data
         // LOGIN
         // =====================================================================
 
-        // Consulta SELECT directa (no usa función PL/SQL) para autenticar al postulante.
-        public Postulante? ObtenerPostulantePorUsuario(string usuario, string clave)
+        // Autentica por usuario y compara la clave con PasswordHasher.Verify (no se
+        // filtra por clave en el SQL porque el valor guardado ahora es un hash, no
+        // texto plano). Si el usuario todavía tiene una clave heredada en texto plano
+        // y el login es correcto, se re-guarda automáticamente como hash PBKDF2.
+        public Postulante? ObtenerPostulantePorUsuario(string usuario, string claveIngresada)
         {
             using var conn = GetConnection();
             conn.Open();
@@ -37,12 +41,32 @@ namespace BecasPosgrado.Data
                        nivel_academico, institucion_procedencia, titulo_obtenido, promedio_academico,
                        empresa_actual, cargo_actual, anios_experiencia
                 FROM POSTULANTE
-                WHERE usuario = :usuario AND clave = :clave";
+                WHERE usuario = :usuario";
             cmd.Parameters.Add(new OracleParameter("usuario", OracleDbType.Varchar2) { Value = usuario });
-            cmd.Parameters.Add(new OracleParameter("clave", OracleDbType.Varchar2) { Value = clave });
 
-            using var reader = cmd.ExecuteReader();
-            return reader.Read() ? MapPostulante(reader) : null;
+            Postulante? postulante;
+            using (var reader = cmd.ExecuteReader())
+            {
+                postulante = reader.Read() ? MapPostulante(reader) : null;
+            }
+
+            if (postulante == null || !PasswordHasher.Verify(claveIngresada, postulante.Clave))
+            {
+                return null;
+            }
+
+            if (!PasswordHasher.EsHashPbkdf2(postulante.Clave))
+            {
+                // Migración perezosa: la primera vez que este usuario entra con éxito,
+                // reemplazamos su clave en texto plano por un hash real.
+                using var cmdUpd = conn.CreateCommand();
+                cmdUpd.CommandText = "UPDATE POSTULANTE SET clave = :clave WHERE id = :id";
+                cmdUpd.Parameters.Add(new OracleParameter("clave", OracleDbType.Varchar2) { Value = PasswordHasher.Hash(claveIngresada) });
+                cmdUpd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = postulante.Id });
+                cmdUpd.ExecuteNonQuery();
+            }
+
+            return postulante;
         }
 
         private static Postulante MapPostulante(IDataRecord r) => new Postulante
@@ -86,7 +110,14 @@ namespace BecasPosgrado.Data
                 JOIN UNIVERSIDAD u ON s.id_universidad = u.id
                 WHERE o.estado = 'Activa'
                   AND SYSDATE <= NVL(o.fecha_limite_postulacion, o.fecha_inicio)
-                ORDER BY o.fecha_inicio DESC";
+                ORDER BY
+                    CASE p.area
+                        WHEN 'Especialidad' THEN 1
+                        WHEN 'Maestría' THEN 2
+                        WHEN 'Doctorado' THEN 3
+                        ELSE 4
+                    END,
+                    o.fecha_inicio DESC";
 
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -149,6 +180,29 @@ namespace BecasPosgrado.Data
             using var cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "F_ACEPTAR_SOLICITUD";
+            cmd.BindByName = true;
+
+            var retorno = new OracleParameter("retorno", OracleDbType.Varchar2, 500)
+            {
+                Direction = ParameterDirection.ReturnValue
+            };
+            cmd.Parameters.Add(retorno);
+            cmd.Parameters.Add(new OracleParameter("p_id_solicitud", OracleDbType.Int32) { Value = idSolicitud });
+
+            cmd.ExecuteNonQuery();
+
+            var valor = (OracleString)retorno.Value;
+            return valor.IsNull ? string.Empty : valor.Value;
+        }
+
+        // Llama F_RECHAZAR_SOLICITUD(p_id_solicitud) RETURN VARCHAR2
+        public string RechazarSolicitud(int idSolicitud)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "F_RECHAZAR_SOLICITUD";
             cmd.BindByName = true;
 
             var retorno = new OracleParameter("retorno", OracleDbType.Varchar2, 500)
@@ -489,7 +543,14 @@ namespace BecasPosgrado.Data
                 JOIN PROGRAMA p ON o.id_programa = p.id
                 JOIN SEDE s ON o.id_sede = s.id
                 JOIN UNIVERSIDAD u ON s.id_universidad = u.id
-                ORDER BY o.fecha_inicio DESC";
+                ORDER BY
+                    CASE p.area
+                        WHEN 'Especialidad' THEN 1
+                        WHEN 'Maestría' THEN 2
+                        WHEN 'Doctorado' THEN 3
+                        ELSE 4
+                    END,
+                    o.fecha_inicio DESC";
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -613,30 +674,36 @@ namespace BecasPosgrado.Data
                                  VALUES (:nombre, :apellido, :email, :telefono, :direccion, :fechaNac,
                                      :usuario, :clave, :rol, :nivelAcademico, :institucionProcedencia, :tituloObtenido,
                                      :promedioAcademico, :empresaActual, :cargoActual, :aniosExperiencia)";
-            AgregarParametrosPostulante(cmd, p);
+            AgregarParametrosPostulante(cmd, p, PasswordHasher.Hash(p.Clave));
             cmd.ExecuteNonQuery();
         }
 
-        public void ActualizarPostulante(Postulante p)
+        // cambiarClave=false deja la columna CLAVE intacta (usado desde "Editar" cuando
+        // el admin no escribió una contraseña nueva, para no pisar el hash existente
+        // ni exponerlo/reescribirlo innecesariamente).
+        public void ActualizarPostulante(Postulante p, bool cambiarClave)
         {
             using var conn = GetConnection();
             conn.Open();
             using var cmd = conn.CreateCommand();
             cmd.BindByName = true;
-            cmd.CommandText = @"UPDATE POSTULANTE SET nombre = :nombre, apellido = :apellido, email = :email,
+
+            var setClave = cambiarClave ? "clave = :clave, " : string.Empty;
+            cmd.CommandText = $@"UPDATE POSTULANTE SET nombre = :nombre, apellido = :apellido, email = :email,
                                      telefono = :telefono, direccion = :direccion, fecha_nac = :fechaNac,
-                                     usuario = :usuario, clave = :clave, rol = :rol,
+                                     usuario = :usuario, {setClave}rol = :rol,
                                      nivel_academico = :nivelAcademico, institucion_procedencia = :institucionProcedencia,
                                      titulo_obtenido = :tituloObtenido, promedio_academico = :promedioAcademico,
                                      empresa_actual = :empresaActual, cargo_actual = :cargoActual,
                                      anios_experiencia = :aniosExperiencia
                                  WHERE id = :id";
-            AgregarParametrosPostulante(cmd, p);
+            AgregarParametrosPostulante(cmd, p, cambiarClave ? PasswordHasher.Hash(p.Clave) : null);
             cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = p.Id });
             cmd.ExecuteNonQuery();
         }
 
-        private static void AgregarParametrosPostulante(OracleCommand cmd, Postulante p)
+        // claveHasheada = null cuando no se debe tocar la columna CLAVE (ver ActualizarPostulante).
+        private static void AgregarParametrosPostulante(OracleCommand cmd, Postulante p, string? claveHasheada)
         {
             cmd.Parameters.Add(new OracleParameter("nombre", OracleDbType.Varchar2) { Value = p.Nombre });
             cmd.Parameters.Add(new OracleParameter("apellido", OracleDbType.Varchar2) { Value = p.Apellido });
@@ -645,7 +712,10 @@ namespace BecasPosgrado.Data
             cmd.Parameters.Add(new OracleParameter("direccion", OracleDbType.Varchar2) { Value = (object?)p.Direccion ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("fechaNac", OracleDbType.Date) { Value = p.FechaNac });
             cmd.Parameters.Add(new OracleParameter("usuario", OracleDbType.Varchar2) { Value = p.Usuario });
-            cmd.Parameters.Add(new OracleParameter("clave", OracleDbType.Varchar2) { Value = p.Clave });
+            if (claveHasheada != null)
+            {
+                cmd.Parameters.Add(new OracleParameter("clave", OracleDbType.Varchar2) { Value = claveHasheada });
+            }
             cmd.Parameters.Add(new OracleParameter("rol", OracleDbType.Varchar2) { Value = p.Rol });
             cmd.Parameters.Add(new OracleParameter("nivelAcademico", OracleDbType.Varchar2) { Value = (object?)p.NivelAcademico ?? DBNull.Value });
             cmd.Parameters.Add(new OracleParameter("institucionProcedencia", OracleDbType.Varchar2) { Value = (object?)p.InstitucionProcedencia ?? DBNull.Value });
@@ -662,6 +732,106 @@ namespace BecasPosgrado.Data
             conn.Open();
             using var cmd = conn.CreateCommand();
             cmd.CommandText = "DELETE FROM POSTULANTE WHERE id = :id";
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = id });
+            cmd.ExecuteNonQuery();
+        }
+
+        // =====================================================================
+        // ABM COMPONENTES (contenidos/módulos de un programa)
+        // =====================================================================
+
+        public List<Componente> ListarComponentes()
+        {
+            var lista = new List<Componente>();
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT c.id, c.nombre, c.id_programa, p.nombre AS programa
+                FROM COMPONENTE c
+                JOIN PROGRAMA p ON c.id_programa = p.id
+                ORDER BY p.nombre, c.nombre";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Componente
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Nombre = reader["nombre"].ToString()!,
+                    IdPrograma = Convert.ToInt32(reader["id_programa"]),
+                    ProgramaNombre = reader["programa"].ToString()
+                });
+            }
+            return lista;
+        }
+
+        public List<Componente> ListarComponentesPorPrograma(int idPrograma)
+        {
+            var lista = new List<Componente>();
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT id, nombre, id_programa FROM COMPONENTE WHERE id_programa = :idPrograma ORDER BY nombre";
+            cmd.Parameters.Add(new OracleParameter("idPrograma", OracleDbType.Int32) { Value = idPrograma });
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                lista.Add(new Componente
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Nombre = reader["nombre"].ToString()!,
+                    IdPrograma = Convert.ToInt32(reader["id_programa"])
+                });
+            }
+            return lista;
+        }
+
+        public Componente? ObtenerComponente(int id)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT id, nombre, id_programa FROM COMPONENTE WHERE id = :id";
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = id });
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read()) return null;
+            return new Componente
+            {
+                Id = Convert.ToInt32(reader["id"]),
+                Nombre = reader["nombre"].ToString()!,
+                IdPrograma = Convert.ToInt32(reader["id_programa"])
+            };
+        }
+
+        public void CrearComponente(Componente c)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "INSERT INTO COMPONENTE (nombre, id_programa) VALUES (:nombre, :idPrograma)";
+            cmd.Parameters.Add(new OracleParameter("nombre", OracleDbType.Varchar2) { Value = c.Nombre });
+            cmd.Parameters.Add(new OracleParameter("idPrograma", OracleDbType.Int32) { Value = c.IdPrograma });
+            cmd.ExecuteNonQuery();
+        }
+
+        public void ActualizarComponente(Componente c)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "UPDATE COMPONENTE SET nombre = :nombre, id_programa = :idPrograma WHERE id = :id";
+            cmd.Parameters.Add(new OracleParameter("nombre", OracleDbType.Varchar2) { Value = c.Nombre });
+            cmd.Parameters.Add(new OracleParameter("idPrograma", OracleDbType.Int32) { Value = c.IdPrograma });
+            cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = c.Id });
+            cmd.ExecuteNonQuery();
+        }
+
+        public void EliminarComponente(int id)
+        {
+            using var conn = GetConnection();
+            conn.Open();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM COMPONENTE WHERE id = :id";
             cmd.Parameters.Add(new OracleParameter("id", OracleDbType.Int32) { Value = id });
             cmd.ExecuteNonQuery();
         }

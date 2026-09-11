@@ -82,4 +82,30 @@ VALUES (5, 3, SYSDATE + 10, SYSDATE - 2, SYSDATE + 15, 1, 'Activa');
 INSERT INTO OFERTA (id_programa, id_sede, fecha_limite_postulacion, fecha_inicio, fecha_fin, cupos_disponibles, estado)
 VALUES (3, 1, SYSDATE - 10, SYSDATE - 60, SYSDATE - 5, 2, 'Cerrada');
 
+-- 6. COMPONENTES (módulos/materias de cada programa, para el ABM de Componentes)
+-- Programa 1: Maestría en Ciencia de Datos
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Fundamentos de Inteligencia Artificial', 1);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Estadística Aplicada', 1);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Big Data y Computación Distribuida', 1);
+
+-- Programa 2: Maestría en Finanzas
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Finanzas Corporativas', 2);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Mercados de Capitales', 2);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Gestión de Riesgo Financiero', 2);
+
+-- Programa 3: Doctorado en Física
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Mecánica Cuántica Avanzada', 3);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Métodos Computacionales en Física', 3);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Seminario de Investigación I', 3);
+
+-- Programa 4: Doctorado en Educación
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Políticas Educativas Comparadas', 4);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Metodología de Investigación Educativa', 4);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Seminario de Tesis', 4);
+
+-- Programa 5: Especialidad en Ciberseguridad
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Seguridad en Redes', 5);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Hacking Ético', 5);
+INSERT INTO COMPONENTE (nombre, id_programa) VALUES ('Criptografía Aplicada', 5);
+
 COMMIT;

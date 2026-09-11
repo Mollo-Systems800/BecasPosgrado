@@ -1,5 +1,6 @@
 using BecasPosgrado.Data;
 using BecasPosgrado.Filters;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using Microsoft.AspNetCore.Mvc;
 using Oracle.ManagedDataAccess.Client;
@@ -24,7 +25,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return View(new List<Postulante>());
             }
         }
@@ -35,6 +36,10 @@ namespace BecasPosgrado.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Postulante model)
         {
+            if (string.IsNullOrWhiteSpace(model.Clave))
+            {
+                ModelState.AddModelError(nameof(model.Clave), "La contraseña es obligatoria.");
+            }
             if (!ModelState.IsValid) return View(model);
             try
             {
@@ -44,7 +49,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 return View(model);
             }
         }
@@ -55,11 +60,12 @@ namespace BecasPosgrado.Controllers
             {
                 var p = _db.ObtenerPostulante(id);
                 if (p == null) return NotFound();
+                p.Clave = string.Empty;
                 return View(p);
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -71,13 +77,14 @@ namespace BecasPosgrado.Controllers
             if (!ModelState.IsValid) return View(model);
             try
             {
-                _db.ActualizarPostulante(model);
+                bool cambiarClave = !string.IsNullOrWhiteSpace(model.Clave);
+                _db.ActualizarPostulante(model, cambiarClave);
                 TempData["Mensaje"] = "Postulante actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 return View(model);
             }
         }
@@ -93,7 +100,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                TempData["Mensaje"] = "No se pudo eliminar: " + ex.Message;
+                TempData["Mensaje"] = "No se pudo eliminar: " + OracleErrorHelper.MensajeAmigable(ex);
             }
             return RedirectToAction(nameof(Index));
         }

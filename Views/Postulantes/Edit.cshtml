@@ -95,7 +95,9 @@
     </div>
     <div class="col-md-6">
         <label asp-for="Clave" class="form-label"></label>
-        <input asp-for="Clave" class="form-control" type="password" />
+        <input asp-for="Clave" class="form-control" type="password" autocomplete="new-password"
+               placeholder="Dejar en blanco para no cambiarla" />
+        <div class="form-text">Deja este campo vacío si no quieres cambiar la contraseña actual.</div>
         <span asp-validation-for="Clave" class="text-danger"></span>
     </div>
     <div class="col-md-6">

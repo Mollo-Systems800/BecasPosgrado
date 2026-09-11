@@ -1,4 +1,5 @@
 using BecasPosgrado.Data;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Oracle.ManagedDataAccess.Client;
@@ -50,7 +51,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 return View(model);
             }
         }

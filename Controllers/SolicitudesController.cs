@@ -1,5 +1,6 @@
 using BecasPosgrado.Data;
 using BecasPosgrado.Filters;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using Microsoft.AspNetCore.Mvc;
 using Oracle.ManagedDataAccess.Client;
@@ -38,7 +39,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return View(new List<Solicitud>());
             }
         }
@@ -56,7 +57,25 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                TempData["Mensaje"] = "Error: " + ex.Message;
+                TempData["Mensaje"] = "Error: " + OracleErrorHelper.MensajeAmigable(ex);
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [RequiereRol("ADMIN")]
+        public IActionResult Rechazar(int id)
+        {
+            try
+            {
+                // Llama a F_RECHAZAR_SOLICITUD y muestra el mensaje que devuelve.
+                var mensaje = _db.RechazarSolicitud(id);
+                TempData["Mensaje"] = mensaje;
+            }
+            catch (OracleException ex)
+            {
+                TempData["Mensaje"] = "Error: " + OracleErrorHelper.MensajeAmigable(ex);
             }
             return RedirectToAction(nameof(Index));
         }

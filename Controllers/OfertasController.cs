@@ -1,5 +1,6 @@
 using BecasPosgrado.Data;
 using BecasPosgrado.Filters;
+using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using BecasPosgrado.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return View(new List<Oferta>());
             }
         }
@@ -59,8 +60,9 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                // Ej: "Ya tiene 3 solicitudes activas", límites, etc.
-                TempData["Mensaje"] = "Error: " + ex.Message;
+                // Ej: "Ya tiene 3 solicitudes activas", límites, etc. (mensaje de negocio
+                // definido en PL/SQL con RAISE_APPLICATION_ERROR, ya es amigable).
+                TempData["Mensaje"] = "Error: " + OracleErrorHelper.MensajeAmigable(ex);
             }
 
             return RedirectToAction(nameof(Index));
@@ -77,7 +79,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return View(new List<Oferta>());
             }
         }
@@ -118,7 +120,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 CargarCombos(model.IdPrograma, model.IdSede);
                 return View(model);
             }
@@ -136,7 +138,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
                 return RedirectToAction(nameof(Administrar));
             }
         }
@@ -159,7 +161,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                ModelState.AddModelError(string.Empty, "Error de base de datos: " + ex.Message);
+                ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
                 CargarCombos(model.IdPrograma, model.IdSede);
                 return View(model);
             }
@@ -177,7 +179,7 @@ namespace BecasPosgrado.Controllers
             }
             catch (OracleException ex)
             {
-                TempData["Mensaje"] = "No se pudo eliminar: " + ex.Message;
+                TempData["Mensaje"] = "No se pudo eliminar: " + OracleErrorHelper.MensajeAmigable(ex);
             }
             return RedirectToAction(nameof(Administrar));
         }

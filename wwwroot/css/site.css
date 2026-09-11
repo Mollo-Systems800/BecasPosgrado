@@ -39,13 +39,37 @@ html {
   overflow-y: scroll;
 }
 
+/* Footer "pegado" abajo, hecho bien con flexbox (no con el viejo truco de
+   position:absolute que causaba el bug del footer flotando a mitad de
+   pantalla). body se vuelve una columna flex de 3 partes: header, el
+   .container que envuelve <main>, y el footer. Al .container que envuelve
+   <main> se le da flex: 1 0 auto (ver más abajo, junto a .footer) para que
+   crezca y empuje el footer hasta el fondo real de la ventana cuando el
+   contenido es corto, y para que simplemente se estire sin problema cuando
+   el contenido es más largo que una pantalla. */
 body {
+  display: flex;
+  flex-direction: column;
+  /* min-height en vh (no en %) a propósito: un % en min-height depende de que
+     el elemento padre (html) tenga una altura ya resuelta, y html solo tiene
+     "min-height: 100%", no "height", así que ese porcentaje nunca terminaba
+     de calcularse contra el alto real de la ventana — por eso el footer se
+     quedaba pegado justo debajo del contenido en vez de ir al fondo real en
+     páginas cortas. 100vh se calcula siempre directo contra el tamaño de la
+     ventana, sin depender de esa cadena de porcentajes, así que aquí sí
+     funciona de forma confiable. */
+  min-height: 100vh;
   margin-bottom: 0;
   font-family: var(--font-body);
   color: var(--ink);
   background-color: var(--bg);
   background-image:
     linear-gradient(180deg, rgba(111, 24, 48, 0.035), rgba(111, 24, 48, 0) 220px);
+}
+
+body > .container {
+  flex: 1 0 auto;
+  width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -272,6 +296,15 @@ header nav.navbar {
 /* ---------- Footer ---------- */
 
 .footer {
+  /* Forzado a estático a propósito: si el footer queda "position: absolute"
+     (patrón por defecto de la plantilla de ASP.NET Core) y el html/body no
+     crecen exactamente con el contenido, el footer puede quedar pegado a la
+     altura de la ventana y "flotar" sobre el contenido en formularios largos,
+     impidiendo llegar al botón Guardar. Con static, el footer siempre va
+     después de todo el contenido, sin importar cuánto mida la página. */
+  position: static !important;
+  flex-shrink: 0;
+  width: 100%;
   background: var(--guindo-dark);
   color: rgba(255, 255, 255, 0.75);
   border-top: 3px solid var(--plata) !important;

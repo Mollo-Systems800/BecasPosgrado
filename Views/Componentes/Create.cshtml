@@ -1,0 +1,31 @@
+@model Componente
+@{
+    ViewData["Title"] = "Nuevo componente";
+}
+
+<h2>Nuevo componente</h2>
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<form asp-action="Create" method="post" class="row g-3" style="max-width: 600px;">
+    <div class="col-12">
+        <label asp-for="IdPrograma" class="form-label">Programa</label>
+        <select asp-for="IdPrograma" asp-items="ViewBag.Programas" class="form-select">
+            <option value="">-- Selecciona --</option>
+        </select>
+        <span asp-validation-for="IdPrograma" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Nombre" class="form-label">Nombre del componente</label>
+        <input asp-for="Nombre" class="form-control" placeholder="Ej: Fundamentos de Inteligencia Artificial" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a asp-action="Index" class="btn btn-link">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

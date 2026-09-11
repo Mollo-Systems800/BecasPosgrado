@@ -3,56 +3,64 @@ using BecasPosgrado.Filters;
 using BecasPosgrado.Helpers;
 using BecasPosgrado.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Oracle.ManagedDataAccess.Client;
 
 namespace BecasPosgrado.Controllers
 {
     [RequiereRol("ADMIN")]
-    public class ProgramasController : Controller
+    public class ComponentesController : Controller
     {
         private readonly OracleDbContext _db;
 
-        public static readonly string[] Areas = { "Especialidad", "Maestría", "Doctorado" };
-
-        public ProgramasController(OracleDbContext db)
+        public ComponentesController(OracleDbContext db)
         {
             _db = db;
+        }
+
+        private void CargarProgramas(int? seleccionado = null)
+        {
+            ViewBag.Programas = new SelectList(_db.ListarProgramas(), "Id", "Nombre", seleccionado);
         }
 
         public IActionResult Index()
         {
             try
             {
-                return View(_db.ListarProgramas());
+                return View(_db.ListarComponentes());
             }
             catch (OracleException ex)
             {
                 ViewBag.Error = OracleErrorHelper.MensajeAmigable(ex);
-                return View(new List<Programa>());
+                return View(new List<Componente>());
             }
         }
 
         public IActionResult Create()
         {
-            ViewBag.Areas = Areas;
-            return View(new Programa());
+            CargarProgramas();
+            return View(new Componente());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Programa model)
+        public IActionResult Create(Componente model)
         {
-            ViewBag.Areas = Areas;
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                CargarProgramas(model.IdPrograma);
+                return View(model);
+            }
             try
             {
-                _db.CrearPrograma(model);
-                TempData["Mensaje"] = "Programa creado correctamente.";
+                _db.CrearComponente(model);
+                TempData["Mensaje"] = "Componente creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (OracleException ex)
             {
                 ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
+                CargarProgramas(model.IdPrograma);
                 return View(model);
             }
         }
@@ -61,10 +69,10 @@ namespace BecasPosgrado.Controllers
         {
             try
             {
-                var p = _db.ObtenerPrograma(id);
-                if (p == null) return NotFound();
-                ViewBag.Areas = Areas;
-                return View(p);
+                var c = _db.ObtenerComponente(id);
+                if (c == null) return NotFound();
+                CargarProgramas(c.IdPrograma);
+                return View(c);
             }
             catch (OracleException ex)
             {
@@ -75,19 +83,23 @@ namespace BecasPosgrado.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Programa model)
+        public IActionResult Edit(Componente model)
         {
-            ViewBag.Areas = Areas;
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                CargarProgramas(model.IdPrograma);
+                return View(model);
+            }
             try
             {
-                _db.ActualizarPrograma(model);
-                TempData["Mensaje"] = "Programa actualizado correctamente.";
+                _db.ActualizarComponente(model);
+                TempData["Mensaje"] = "Componente actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (OracleException ex)
             {
                 ModelState.AddModelError(string.Empty, OracleErrorHelper.MensajeAmigable(ex));
+                CargarProgramas(model.IdPrograma);
                 return View(model);
             }
         }
@@ -98,8 +110,8 @@ namespace BecasPosgrado.Controllers
         {
             try
             {
-                _db.EliminarPrograma(id);
-                TempData["Mensaje"] = "Programa eliminado correctamente.";
+                _db.EliminarComponente(id);
+                TempData["Mensaje"] = "Componente eliminado correctamente.";
             }
             catch (OracleException ex)
             {

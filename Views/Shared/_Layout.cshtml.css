@@ -39,10 +39,10 @@ button.accept-policy {
   line-height: inherit;
 }
 
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
-}
+/* El footer real del sitio (color guindo, etc.) se define en wwwroot/css/site.css.
+   Esta regla venía de la plantilla por defecto de ASP.NET Core: posicionaba el
+   footer en "position: absolute; bottom: 0" respecto a la altura de una sola
+   pantalla, así que en formularios largos (más altos que la ventana) el footer
+   terminaba "flotando" en medio del contenido y bloqueaba el scroll hacia el
+   botón Guardar. Se quita por completo para que el footer quede en flujo normal,
+   siempre después de todo el contenido, sin importar qué tan largo sea. */

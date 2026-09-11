@@ -33,7 +33,10 @@ namespace BecasPosgrado.Models
         [Required, StringLength(50)]
         public string Usuario { get; set; } = string.Empty;
 
-        [Required, StringLength(255)]
+        // Sin [Required]: en Crear se exige explícitamente en el controlador; en
+        // Editar se deja en blanco a propósito para "no cambiar la contraseña"
+        // (ver PostulantesController). Nunca se pre-carga con el valor real.
+        [StringLength(255)]
         public string Clave { get; set; } = string.Empty;
 
         // 'ADMIN' o 'POSTULANTE'

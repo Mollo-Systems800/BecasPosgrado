@@ -8,7 +8,7 @@
 
 @if (ViewBag.Error != null)
 {
-    <div class="alert alert-danger">Error de base de datos: @ViewBag.Error</div>
+    <div class="alert alert-danger">@ViewBag.Error</div>
 }
 
 @if (!Model.Any())
@@ -68,6 +68,10 @@ else
                             {
                                 <form asp-action="Aceptar" asp-route-id="@s.Id" method="post" class="d-inline">
                                     <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
+                                </form>
+                                <form asp-action="Rechazar" asp-route-id="@s.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('¿Rechazar esta solicitud?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Rechazar</button>
                                 </form>
                             }
                         </td>
